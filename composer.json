@@ -1,0 +1,24 @@
+{
+    "name" : "hduwzy/grabber",
+    "type" : "library",
+    "description" : "web grabber",
+    "keywords" : ["grabber", "web grabber", "fetcher"],
+    "homepage" : "https://github.com/hduwzy/grabber",
+    "license" : "MIT",
+    "authors" : [
+        {
+            "name" : "wzy",
+            "email" : "hduwzy@163.com",
+            "homepage" : "",
+            "role" : "Developer"
+        }
+    ],
+    "require" : {
+       "guzzlehttp/guzzle" : ">6.0.0" 
+    },
+    "autoload" : {
+        "psr-4" : {
+            "Wgrabber" : ""
+        }
+    }    
+}
