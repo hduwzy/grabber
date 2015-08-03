@@ -3,6 +3,7 @@
     "type" : "library",
     "description" : "web grabber",
     "keywords" : ["grabber", "web grabber", "fetcher"],
+    "version" : "1.0.0",
     "homepage" : "https://github.com/hduwzy/grabber",
     "license" : "MIT",
     "authors" : [
