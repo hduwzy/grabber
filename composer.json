@@ -6,20 +6,29 @@
     "version" : "1.0.0",
     "homepage" : "https://github.com/hduwzy/grabber",
     "license" : "MIT",
+    "repositories" : [
+        {
+            "packagist" : false
+        },
+        {
+            "type" : "composer",
+            "url" : "http://packagist.cn"
+        }
+    ],
     "authors" : [
         {
             "name" : "wzy",
             "email" : "hduwzy@163.com",
-            "homepage" : "",
             "role" : "Developer"
         }
     ],
     "require" : {
-       "guzzlehttp/guzzle" : ">6.0.0" 
+       "guzzlehttp/guzzle" : ">6.0.0",
+        "electrolinux/phpquery": "^0.9.6" 
     },
     "autoload" : {
         "psr-4" : {
-            "Wgrabber\\" : ""
+            "Wgrabber\\" : "src"
         }
     }    
 }
