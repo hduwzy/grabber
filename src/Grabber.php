@@ -1,27 +1,51 @@
 <?php
+/**
+ * grabber
+ * @package hduwzy/grabber
+ * @author hduwzy
+ */
 namespace Wgrabber;
 
 use GuzzleHttp\Client;
 
 class Grabber {
+	// GuzzleHttpClient instance
 	private $httpclient;
 
+	// base uri
 	private $baseurl;
+
+	// request method
 	private $method;
+
+	// request params
 	private $param;
 
+	/**
+	 * constructor
+	 */
 	public function __construct()
 	{
 		$this->httpclient = new Client();
 	}
 
 
+	/**
+	 * 设置请求链接
+	 * @param $baseurl string
+	 * @return $this
+	 */
 	public function from($baseurl)
 	{
 		$this->baseurl = $baseurl;
 		return $this;
 	}
 
+	/**
+	 * 设置请求
+	 * @param $method
+	 * @return $this
+	 */
 	public function with($method)
 	{
 		if (in_array(strtolower($method), ['get', 'post'])) {
@@ -37,6 +61,11 @@ class Grabber {
 
 	}
 
+	/**
+	 * 设置请求参数
+	 * @param $param 参数
+	 * @return $this
+	 */
 	public function param($param)
 	{
 		$this->param = $param;
@@ -44,6 +73,10 @@ class Grabber {
 	}
 
 
+	/**
+	 * 解析参数，形成请求参数数组
+	 * @return array
+	 */
 	protected function resolvedParam()
 	{
 		$resolved = [];
@@ -51,17 +84,22 @@ class Grabber {
 		$arrayKey = [];
 		$normalKey = [];
 
+		// 循环给出的参数，判断需要被枚举的参数
 		foreach ($this->param as $key => $val) {
 			if (is_array($val) ){
+				// 用数组的形式给出多个参数
 				$arrayKey[$key] = $val;
 			} elseif (preg_match('/[0-9]+:[0-9]+(:[0-9]+)?/', $val)) {
+				//用范围的形式给出多个参数
 				$needResolvekey[$key] = $val;
 			} else {
+				// 一般参数
 				$normalKey[$key] = $val;
 			}
 		}
 
 		foreach ($needResolvekey as $key => $val) {
+			// 解析范围参数:1、"1:5"-> range(1,5); 2、"1:10:2" -> range(1,10,2)
 			$values = explode(':', $val);
 			switch (count($values)) {
 				case 2:
@@ -74,6 +112,17 @@ class Grabber {
 			}
 		}
 
+		/**
+		 * 由 ['a' => [1,2], 'b' => [3,4,5]]  得到
+		 * [
+		 * 		['a' => 1, 'b' => 3],
+		 * 		['a' => 1, 'b' => 4],
+		 * 		['a' => 1, 'b' => 5],
+		 * 		['a' => 2, 'b' => 3],
+		 * 		['a' => 2, 'b' => 4],
+		 * 		['a' => 2, 'b' => 5],
+		 * ]
+		 */
 		foreach ($arrayKey as $key => $values) {
 			if (empty($resolved)) {
 				foreach ($values as $item) {
@@ -92,6 +141,8 @@ class Grabber {
 				$resolved = $resolvedTemp;
 			}
 		}
+
+		// 将一般参数合并到上面产生的组合中
 		foreach ($resolved as &$p) {
 			$p = array_merge($p, $normalKey);
 		}
@@ -104,11 +155,24 @@ class Grabber {
 	}
 
 
+	/**
+	 * 深度优先抓取
+	 * @param $selector phpQuery选择器
+	 * @param $action Closure 获得匹配数据后执行的操作，为null的情况则返回会的数据
+	 * @return array
+	 */
 	public function dfsGrab($selectors, \Closure $action = null)
 	{
 
 	}
 
+
+	/**
+	 * 深度优先抓取
+	 * @param $selector phpQuery选择器
+	 * @param $action Closure 获得匹配数据后执行的操作，为null的情况则返回会的数据
+	 * @return array
+	 */
 	public function wfsGrab($selectors, \Closure $action = null)
 	{
 		$params = $this->resolvedParam();
@@ -136,6 +200,12 @@ class Grabber {
 		}
 	}
 
+	/**
+	 * 抓取数据接口
+	 * @param $type 指定接口返回的数据类型，调用不同的数据解析方法
+	 * @param  $action Closure 获得匹配数据后执行的操作，为null的情况则返回会的数据
+	 * @return mix
+	 */
 	public function get($type="json", \Closure $action = null)
 	{
 		$params = $this->resolvedParam();
@@ -162,16 +232,25 @@ class Grabber {
 		}
 	}
 
+	/**
+	 * 内部方法，解析get返回的json数据
+	 */
 	protected function parseJson($data)
 	{
 		return json_decode($data);
 	}
 
+	/**
+	 * 内部方法，解析get返回的php序列化数据
+	 */
 	protected function parsePhp($data)
 	{
 		return unserialize($data);
 	}
 
+	/**
+	 * 内部方法，解析get返回的jsonp数据
+	 */
 	protected function parseJsonp($data)
 	{
 		$matches = [];
