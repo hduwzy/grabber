@@ -21,12 +21,19 @@ class Grabber {
 	// request params
 	private $param;
 
+	// 参数key
+	private $paramKey;
+
+	// 请求超时时间
+	private $timeout;
+
 	/**
 	 * constructor
 	 */
 	public function __construct()
 	{
 		$this->httpclient = new Client();
+		$this->timeout = 3;
 	}
 
 
@@ -53,6 +60,28 @@ class Grabber {
 		} else {
 			$this->method = 'get';
 		}
+		switch ($this->method) {
+			case 'get' :
+				$this->paramKey = 'query';
+				break;
+			case 'post':
+				$this->paramKey = 'form_params';
+				break;
+			default:
+				$this->paramKey = 'query';
+				break;
+		}
+		return $this;
+	}
+
+	/**
+	 * 设置超时时间
+	 * @param int $time seconds
+	 * @return \Wgrabber\Grabber
+	 */
+	public function timeout($time)
+	{
+		$this->timeout = $time;
 		return $this;
 	}
 
@@ -154,6 +183,14 @@ class Grabber {
 		}
 	}
 
+//TODO...
+// 	protected function select($selectors, $contents)
+// 	{
+// 		$rootDom = \phpQuery::newDocumentHTML($contents);
+// 		foreach ($selectors as $selector => $fields) {
+// 			$doms = $rootDom->find($selector);
+// 		}
+// 	}
 
 	/**
 	 * 深度优先抓取
@@ -178,7 +215,11 @@ class Grabber {
 		$params = $this->resolvedParam();
 		$resultData = [];
 		foreach ($params as $param) {
-			$result = $this->httpclient->get($this->baseurl, ['query' => $param, 'timeout' => 2]);
+// 			$result = $this->httpclient->get($this->baseurl, [$this->paramKey => $param, 'timeout' => $this->timeout]);
+			$result = call_user_func_array(
+				[$this->httpclient, $this->method],
+				[[$this->paramKey => $param, 'timeout' => $this->timeout]]
+			);
 			if (false === $result) {
 				continue;
 			}
@@ -211,7 +252,11 @@ class Grabber {
 		$params = $this->resolvedParam();
 		$resultData = [];
 		foreach ($params as $param) {
-			$result = $this->httpclient->get($this->baseurl, ['query' => $param, 'timeout' => 2]);
+// 			$result = $this->httpclient->get($this->baseurl, ['query' => $param, 'timeout' => 2]);
+			$result = call_user_func_array(
+				[$this->httpclient, $this->method],
+				[[$this->paramKey => $param, 'timeout' => $this->timeout]]
+			);
 			if (false === $result) {
 				continue;
 			}
