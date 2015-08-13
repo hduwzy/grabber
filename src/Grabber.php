@@ -218,7 +218,7 @@ class Grabber {
 // 			$result = $this->httpclient->get($this->baseurl, [$this->paramKey => $param, 'timeout' => $this->timeout]);
 			$result = call_user_func_array(
 				[$this->httpclient, $this->method],
-				[[$this->paramKey => $param, 'timeout' => $this->timeout]]
+				[$this->baseurl, [$this->paramKey => $param, 'timeout' => $this->timeout]]
 			);
 			if (false === $result) {
 				continue;
@@ -255,7 +255,7 @@ class Grabber {
 // 			$result = $this->httpclient->get($this->baseurl, ['query' => $param, 'timeout' => 2]);
 			$result = call_user_func_array(
 				[$this->httpclient, $this->method],
-				[[$this->paramKey => $param, 'timeout' => $this->timeout]]
+				[$this->baseurl, [$this->paramKey => $param, 'timeout' => $this->timeout]]
 			);
 			if (false === $result) {
 				continue;
